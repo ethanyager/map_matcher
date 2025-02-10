@@ -1,14 +1,11 @@
-# publish_events.py
 import json
 import pulsar
 
-# Connect to Pulsar (adjust the URL if necessary)
 client = pulsar.Client('pulsar://localhost:55001')
 
-# Create a producer for the "gps-events" topic
 producer = client.create_producer('gps-events')
 
-# Create some sample GPS events (make sure these match the structure expected by your app)
+# TODO Load GPS events from file
 sample_events = [
     {
         "journey_id": "test_journey_1",

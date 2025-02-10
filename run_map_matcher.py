@@ -1,4 +1,3 @@
-# run_map_matcher.py
 import json
 import os
 import time
@@ -17,7 +16,7 @@ def process_event(event, matcher):
     Process a single event by extracting the GPS coordinate and running the matcher.
     """
     gps_point = (event["lat"], event["lon"])
-    # match_trace expects a list of points; for simplicity, we pass a one-element list.
+    # match_trace expects a list of points; for simplicity pass a one-element list.
     matched_edges = matcher.match_trace([gps_point])
     return matched_edges[0] if matched_edges else None
 
@@ -37,7 +36,7 @@ def insert_into_postgres(conn, event, matched_edge):
     cur.close()
 
 def main():
-    # Connect / create table if it doesn't exist
+    # Connect & create table if it doesn't exist
     conn = psycopg2.connect(POSTGRES_CONN)
     cur = conn.cursor()
     cur.execute("""
