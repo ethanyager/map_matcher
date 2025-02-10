@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: map-matcher-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: map-matcher
+        image: ethanyager/map-matcher:latest
+        env:
+          - name: PULSAR_SERVICE_URL
+            value: "pulsar://pulsar-service:6650"
+          - name: POSTGRES_CONN
+            value: "dbname=mapmatcher user=postgres password=postgres host=postgres-service port=5432"
+          - name: PULSAR_TOPIC
+            value: "gps-events"
+        command: ["python", "run_map_matcher.py"]
+      restartPolicy: Never
+  backoffLimit: 4
