@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pulsar
+  labels:
+    app: pulsar
+spec:
+  containers:
+  - name: pulsar
+    image: ethanyager/pulsar:latest
+    #command: [ "/opt/pulsar/bin/pulsar" ]
+    #args: [ "standalone" ]
+    resources:
+      requests:
+        memory: "3Gi"
+      limits:
+        memory: "4Gi"

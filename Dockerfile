@@ -1,60 +1,28 @@
+# Use a slim Python image as the base.
 FROM python:3.9-slim
 
+# Install system dependencies needed for building C++ extensions.
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
     g++ \
-    wget \
-    supervisor \
-    postgresql \
-    postgresql-contrib \
-    openjdk-17-jdk \
-    && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
-# Add PostgreSQL binaries to PATH.
-ENV PATH="/usr/lib/postgresql/15/bin:${PATH}"
-
-# Set environment variables for PostgreSQL
-ENV PGDATA=/var/lib/postgresql/data
-
-# Create PostgreSQL data directory, fix permissions
-RUN mkdir -p /var/lib/postgresql/data && chown -R postgres:postgres /var/lib/postgresql/data
-
-# Switch to the postgres user to initialize the database
-USER postgres
-RUN initdb -D /var/lib/postgresql/data
-RUN pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/data/logfile start && \
-    psql --command "ALTER USER postgres WITH PASSWORD 'postgres';" && \
-    psql --command "CREATE DATABASE mapmatcher;" && \
-    pg_ctl -D /var/lib/postgresql/data stop
-
-USER root
-
-
-
-# Get pulsar
-RUN wget https://archive.apache.org/dist/pulsar/pulsar-2.11.1/apache-pulsar-2.11.1-bin.tar.gz -O /tmp/pulsar.tar.gz && \
-    tar -xzf /tmp/pulsar.tar.gz -C /opt && \
-    mv /opt/apache-pulsar-2.11.1 /opt/pulsar && \
-    rm /tmp/pulsar.tar.gz
-
+# Set the working directory.
 WORKDIR /app
 
+# Copy your application code into the container.
 COPY . /app
 
-RUN pip install --upgrade pip
-RUN pip install pybind11 pulsar-client psycopg2-binary apache-airflow
+# Upgrade pip and install only the Python dependencies required by your script.
+# (Exclude dependencies related to running services like Pulsar or PostgreSQL here.)
+RUN pip install --upgrade pip && \
+    pip install pybind11 psycopg2-binary pulsar-client
 
-RUN airflow db init && \
-    airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin
-
-# Build the C++ extension module (map_matcher)
+# Build your C++ extension module (assuming your setup.py is set up for this).
 RUN python setup.py build_ext --inplace
 
-# PostgreSQL (5432), Pulsar (6650 for broker, 8080 for admin), Airflow server (8081)
-EXPOSE 5432 6650 8080 8081
-
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Use supervisord to start all services
-CMD ["/usr/bin/supervisord", "-n"]
+# Set the command to run your map matcher script.
+# Replace 'map_matcher.py' with the actual entrypoint script for your application.
+CMD ["python", "run_map_matcher.py"]
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
