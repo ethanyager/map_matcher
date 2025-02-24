@@ -1,7 +1,7 @@
 import json
 import pulsar
 
-client = pulsar.Client('pulsar://127.0.0.1:61819')
+client = pulsar.Client('pulsar://127.0.0.1:6650')
 
 producer = client.create_producer('gps-events')
 

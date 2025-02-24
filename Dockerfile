@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY . /app
+COPY nlohmann/json.hpp /usr/include/nlohmann/json.hpp
 
 RUN pip install --upgrade pip && \
     pip install pybind11 psycopg2-binary pulsar-client
